@@ -3,6 +3,7 @@
 #include <string.h>
 #include <limits.h>
 #include <time.h>
+#include <sys/stat.h>
 #include "rkrom_29xx.h"
 #include "md5.h"
 
@@ -72,9 +73,10 @@ int check_md5sum(FILE *fp, size_t length)
 	return -1;
 }
 
-int unpack_rom(const char* filepath, const char* dstfile)
+int unpack_rom(const char* filepath, const char* dstpath,int createpath)
 {
 	struct _rkfw_header rom_header;
+	char dstfile[strlen(dstpath) + 20];
 
 	FILE *fp = fopen(filepath, "rb");
 	if (!fp)
@@ -113,8 +115,13 @@ int unpack_rom(const char* filepath, const char* dstfile)
 		goto unpack_fail;
 	}
 	printf("OK\n");
-
-	//export_data(loader_filename, rom_header.loader_offset, rom_header.loader_length, fp);
+	if(createpath && mkdir(dstpath,S_IRWXU | S_IRWXG | S_IRWXO)){
+		fprintf(stderr,"create dest path error.%s(%d)",strerror (errno),errno);
+		goto unpack_fail;
+	}
+	sprintf(dstfile,"%s/loader.img",dstpath);
+	export_data(dstfile, rom_header.loader_offset, rom_header.loader_length, fp);
+	sprintf(dstfile,"%s/update.img",dstpath);
 	export_data(dstfile, rom_header.image_offset, rom_header.image_length, fp);
 
 	fclose(fp);
@@ -127,13 +134,22 @@ unpack_fail:
 
 int main(int argc, char **argv)
 {
+	struct stat st;
+	int createdir = 1;
 	if (argc != 3)
 	{
-		fprintf(stderr, "usage: %s <source> <destination>\n", argv[0]);
+		fprintf(stderr, "usage: %s <source> <destination folder>\n", argv[0]);
 		return 1;
 	}
-	
-	unpack_rom(argv[1], argv[2]);
+	if(!stat(argv[2],&st) && !S_ISDIR(st.st_mode))
+	{
+		fprintf(stderr,"%s exist and it's not a directory.\n",argv[2]);
+		return 1;
+	}
+	if(S_ISDIR(st.st_mode)){
+		createdir = 0;
+	}
+	unpack_rom(argv[1], argv[2],createdir);
 
 	return 0;
 }
