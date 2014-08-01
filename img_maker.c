@@ -7,7 +7,18 @@
 #include "rkafp.h"
 #include "md5.h"
 
-unsigned int chiptype = 0x50;
+struct chip {
+	char *chipname;
+	int chiptype;
+} chip_list[] = {
+	{"rk29", 0x50},
+	{"rk30", 0x60},
+	{"rk31", 0x70},
+	{"rk32", 0x80},
+	{NULL, 0x00},
+};
+
+unsigned int chiptype = 0x80;	/* default to RK3288 */
 
 unsigned int import_data(const char* infile, void *head, size_t head_len, FILE *fp)
 {
@@ -176,16 +187,45 @@ pack_fail:
 	return -1;
 }
 
+static void show_usage()
+{
+	fprintf(stderr, "usage: img_maker [chiptype] <loader> <old image> <out image>\n\
+chiptype:\n\
+    -rk29\n\
+    -rk30\n\
+    -rk31\n\
+    -rk32\n\
+\n\
+If chiptype is missing, it is default to -rk32.\n\n\
+");
+}
+
 int main(int argc, char **argv)
 {
-	if (argc == 4)
+	if (argc >= 4)
 	{
-		pack_rom(argv[1], argv[2], argv[3]);
+		int i = 1;
+		if (argv[i][0] == '-')
+		{
+			/* check chip type */
+			struct chip *c;
+			for (c = chip_list; c->chipname; c++) {
+				if (!strcmp(c->chipname, argv[i] + 1)) {
+					chiptype = c->chiptype;
+					i += 1;
+				}
+			}
+			if (! c->chipname)
+			{
+				i = argc;		/* fall through to usage */
+			}
+		}
+		if (i + 3 == argc) 
+		{
+			return pack_rom(argv[i], argv[i + 1], argv[i + 2]);
+		}
 	}
-	else
-	{
-		fprintf(stderr, "usage: %s <loader> <old image> <out image>\n", argv[0]);
-	}
-
-	return 0;
+	show_usage();
+	return 1;
 }
+
