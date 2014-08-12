@@ -213,6 +213,7 @@ int main(int argc, char **argv)
 				if (!strcmp(c->chipname, argv[i] + 1)) {
 					chiptype = c->chiptype;
 					i += 1;
+					break;
 				}
 			}
 			if (! c->chipname)
