@@ -246,7 +246,7 @@ int parse_partitions(char *str) {
 
 int action_parse_key(char *key, char *value) {
 	if (strcmp(key, "FIRMWARE_VER") == 0) {
-		unsigned int a, b, c;
+		unsigned int a = 0, b = 0, c = 0;
 		sscanf(value, "%d.%d.%d", &a, &b, &c);
 		package_image.version = (a << 24) + (b << 16) + c;
 	} else if (strcmp(key, "MACHINE_MODEL") == 0) {
