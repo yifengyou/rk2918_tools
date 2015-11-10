@@ -213,6 +213,8 @@ int parse_partitions(char *str) {
 			p_part = &(package_image.partitions[package_image.num_partition]);
 
 			p_part->size = strtol(part, &ptr, 16);
+                        if (ptr == part && *part == '-')
+                            p_part->size = 0xFFFFFFFF;
 			ptr = strchr(ptr, '@');
 			if (!ptr)
 				continue;
