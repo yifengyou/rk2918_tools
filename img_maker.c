@@ -13,7 +13,8 @@ struct chip {
 } chip_list[] = {
 	{"rk29", 0x50},
 	{"rk30", 0x60},
-	{"rk31", 0x70},
+	/* {"rk31", 0x70}, */
+	{"rk31", 0x33313241}, /* default to RK3128 */
 	{"rk32", 0x80},
 	{NULL, 0x00},
 };
