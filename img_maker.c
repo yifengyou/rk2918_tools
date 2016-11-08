@@ -16,6 +16,7 @@ struct chip {
 	/* {"rk31", 0x70}, */
 	{"rk31", 0x33313241}, /* default to RK3128 */
 	{"rk32", 0x80},
+	{"rk33", 0x33333043}, /* default to RK3399 */
 	{NULL, 0x00},
 };
 
@@ -196,6 +197,7 @@ chiptype:\n\
     -rk30\n\
     -rk31\n\
     -rk32\n\
+    -rk33\n\
 \n\
 If chiptype is missing, it is default to -rk32.\n\n\
 ");
