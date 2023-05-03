@@ -12,3 +12,8 @@ all: ${TARGETS}
 
 clean:
 	rm ${TARGETS}
+
+install:
+	sudo install -m 0755 ${TARGETS} /bin/
+	@cd /bin/ && ls -alh ${TARGETS}
+	@echo "All done!"
