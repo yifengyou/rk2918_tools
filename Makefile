@@ -8,6 +8,7 @@ LDLIBS := -lssl -lcrypto
 TARGETS := afptool img_unpack img_maker mkkrnlimg
 
 all: ${TARGETS}
+	@echo "All done!"
 
 clean:
 	rm ${TARGETS}
